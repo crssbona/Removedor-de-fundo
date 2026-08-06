@@ -1,0 +1,121 @@
+FERRAMENTAS DE MÍDIA
+====================
+
+Cinco ferramentas em um só lugar:
+  1) Remover fundo de IMAGENS (gera PNG transparente)
+  2) Baixar vídeos do YOUTUBE em MP4 (máxima qualidade) ou MP3
+  3) Remover fundo de VÍDEOS com IA (objetos em geral), na sua GPU
+  4) PERSONAGENS: achar em que minutos cada personagem aparece num filme
+     (live-action), a partir de fotos de referência
+  5) LEGENDA: música + letra -> SRT palavra por palavra sincronizado
+
+
+COMO USAR
+---------
+- Dê dois cliques em "Iniciar.bat".
+- O navegador abre sozinho em http://localhost:8765
+- Para fechar, feche a janela preta do servidor.
+
+(A aba "Imagem" também funciona abrindo o index.html direto,
+ mas as abas "YouTube" e "Vídeo" PRECISAM do servidor rodando.)
+
+
+ABA "VÍDEO" — como funciona
+---------------------------
+- Envie um vídeo, escolha o MODO, o formato e processe.
+- Dois modos de recorte:
+    * Automático (IS-Net) ... pega o objeto saliente sozinho. Rápido (~5 q/s).
+                              Pode errar objetos claros/de baixo contraste.
+    * Preciso (SAM 2) ....... você CLICA nos objetos no 1o quadro e ele rastreia
+                              o vídeo todo. Garante objetos que o automático perde.
+        - Clique ESQUERDO = manter · Clique DIREITO = tirar.
+        - "+ Novo objeto" para cada item separado (a pessoa, cada gaivota...).
+        - Dica: 1 clique no meio do objeto costuma pegar o objeto inteiro.
+          Só adicione mais cliques se ele pegar de menos/de mais.
+        - Modelo do SAM 2: Tiny (rápido) ou Base+ (mais preciso, mais lento).
+        - Borda suavizada (anti-serrilhado) automaticamente.
+    * Matte (MatAnyone) ..... MELHOR BORDA. Também por cliques (usa o SAM 2 como
+                              semente) e gera um MATTE suave de verdade — ideal
+                              para cabelo/penas/bordas finas. ~7 q/s na GTX 1660.
+                              (Licenca do modelo: uso pessoal/nao-comercial.)
+- Saídas:
+    * MP4 fundo verde .... RECOMENDADO. Pronto pro CHROMA KEY do CapCut.
+    * WebM / MOV ......... transparentes (alpha). ATENÇÃO: em players comuns e
+                          no CapCut aparecem com FUNDO PRETO (eles ignoram a
+                          transparência). Só use em editor que respeita alpha
+                          (Premiere/After Effects). Para o CapCut, use MP4 verde!
+- O áudio original é mantido por padrão.
+- Processa quadro a quadro na sua placa (GTX 1660), então leva alguns
+  minutos por vídeo.
+
+No CapCut (MP4 verde): coloque o vídeo de fundo embaixo, o seu vídeo verde
+na trilha de cima, aplique "Chroma key / Remover cor" tocando no verde,
+e adicione as camadas de texto por cima.
+
+
+ABA "PERSONAGENS" — como funciona (só live-action)
+--------------------------------------------------
+1) Adicione os personagens: nome + 2 a 4 fotos de cada (frontais, nítidas,
+   rosto bem visível — fotos do Google servem).
+2) Envie UM OU VÁRIOS vídeos (episódios de uma vez!) e "Iniciar análise".
+3) Resultado: abas por episódio; para cada personagem, os minutos em que
+   aparece (sozinho), e as seções "juntos no mesmo quadro"/"na mesma cena".
+   - COMPILADO: com vários episódios, o botão "Salvar todas as cenas (todos
+     os eps)" junta as cenas do personagem na TEMPORADA inteira num vídeo só.
+   - CENAS: todas as cenas aparecem listadas (horários). Clique no HORÁRIO
+     para ver aquela cena no player; clique no ⬇ ao lado para salvar SÓ
+     aquela cena. (Player só toca MP4/H.264; MKV/HEVC pode não tocar, mas o
+     salvar funciona igual.)
+   - SALVAR VÁRIAS: o botão "Salvar N cenas" junta todas as cenas daquele
+     personagem/par num vídeo só. Tudo em QUALIDADE ORIGINAL (corte sem
+     re-encodar; encaixa no keyframe mais próximo, uns décimos de folga).
+   - Exportar tudo em CSV também.
+- Ajuste "Sensibilidade" se pegar pessoa errada (diminua) ou perder
+  aparições (aumente). NÃO funciona em animação/anime.
+
+
+O QUE FICA NA PASTA
+-------------------
+- index.html ......... a interface (site)
+- server.py .......... o servidor local (Python)
+- vmatte.py .......... motor do modo Automático (IS-Net)
+- sam2_worker.py ..... motor do modo Preciso (SAM 2)
+- matanyone_worker.py  motor do modo Matte (MatAnyone)
+- face_worker.py ..... motor de reconhecimento facial (InsightFace)
+- srt_worker.py ...... motor de legenda por palavra (Demucs + alinhador MMS)
+
+
+ABA "LEGENDA" — como funciona (música)
+--------------------------------------
+1) Envie a MÚSICA (mp3/wav/m4a, ou até um vídeo) e cole a LETRA (na ordem
+   cantada, com os refrões repetidos).
+2) "Gerar legenda": a IA separa os vocais (Demucs) e alinha a letra ao canto,
+   palavra por palavra.
+3) Resultado: um PREVIEW (toca a música e a palavra atual acende; clique numa
+   palavra pra pular) + botão "Baixar SRT". O SRT tem uma palavra por legenda.
+   - SINCRONIA: um controle "adiantar / atrasar" ajusta o tempo de TODAS as
+     palavras de uma vez (o preview atualiza na hora e vai pro SRT baixado).
+     Se a legenda estiver atrasada, arraste pra "adiantar". Padrão: -100 ms.
+   - O CapCut importa SRT (cada palavra vira um texto no seu tempo).
+   - Melisma (sílaba esticada) pode deixar uma palavra "elástica"; às vezes
+     precisa de um ajuste manual fino.
+- bin\ ............... ffmpeg/ffprobe
+- models\ ............ modelos de IA (isnet + sam2 tiny + sam2 base_plus)
+- downloads\ ......... arquivos baixados/processados (pode apagar quando quiser)
+
+
+REQUISITOS (já instalados nesta máquina)
+----------------------------------------
+- Python 3
+- yt-dlp                 (atualize com:  python -m pip install -U yt-dlp )
+- ffmpeg                 (incluído na pasta bin\)
+- onnxruntime-directml   (modo Automático na GPU via DirectML)
+- torch + torchvision (CUDA 12.6) + sam2   (modo Preciso na GPU via CUDA)
+- matanyone (+ deps de inferência)         (modo Matte)
+- numpy, Pillow, opencv-python
+
+
+OBSERVAÇÃO
+----------
+Baixe/processe apenas conteúdo que você tem direito de usar. Baixar vídeos
+pode violar os Termos de Serviço do YouTube — a responsabilidade do uso é sua.

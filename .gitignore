@@ -1,0 +1,20 @@
+# === Baixado automaticamente pelo setup.py (NÃO versionar — é pesado) ===
+bin/
+models/
+downloads/
+.setup_ok
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Config de desenvolvimento / editor
+.claude/
+
+# Sistema
+.DS_Store
+Thumbs.db
+*.part

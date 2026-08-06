@@ -1,0 +1,19 @@
+COMO EXECUTAR
+=============
+
+1) Dê dois cliques em "Iniciar.bat".
+
+2) NA PRIMEIRA VEZ ele baixa e instala tudo automaticamente
+   (PyTorch + modelos = vários GB, demora bastante). Deixe rodando.
+   Das próximas vezes abre rápido.
+
+3) O navegador abre sozinho em http://localhost:8765
+   (para fechar, feche a janela preta do servidor).
+
+Precisa ter:
+ - Windows
+ - Python 3.10+  (marque "Add Python to PATH" ao instalar)
+ - (opcional) GPU NVIDIA = mais rápido
+ - (opcional) Git = habilita os modos "Preciso" e "Matte" do vídeo
+
+Se algo já estiver baixado, o Iniciar.bat NÃO dá erro — ele pula.
